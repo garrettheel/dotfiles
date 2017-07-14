@@ -1,14 +1,19 @@
 call plug#begin('~/.local/share/nvim/plugged')
+
+" FZF
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+nnoremap <C-p> :FZF<CR>
 
 " NERDTree
 
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 :command NT NERDTreeToggle
 :command NTF NERDTreeFind
-let NERDTreeIgnore = ['\.pyc$', '\.egg-info$']
+let NERDTreeIgnore = ['\.pyc$', '\.egg-info$', '\.__pycache__$']
 let NERDTreeShowHidden=1
+let loaded_netrw=0  " Turn off netrw
+" autocmd VimEnter * NERDTree
 
 " Ag
 
@@ -68,7 +73,6 @@ let g:neomake_highlight_columns = 0
 
 call plug#end()
 
-nnoremap <C-p> :FZF<CR>
 
 set showcmd             " Show (partial) command in status line.
 set showmatch           " Show matching brackets.
@@ -112,6 +116,20 @@ autocmd Filetype yaml setlocal ts=2 sts=2 sw=2
 autocmd Filetype zsh  setlocal ts=2 sts=2 sw=2
 
 " Python 79 lines.
-autocmd Filetype python setlocal textwidth=79
+" autocmd Filetype python setlocal textwidth=79
 
+" Python 3
+set encoding=utf-8
+
+
+" Split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
+
+" Show bad whitespace
+highlight BadWhitespace ctermbg=red guibg=darkred
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
