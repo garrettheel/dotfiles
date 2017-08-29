@@ -13,7 +13,10 @@ Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 let NERDTreeIgnore = ['\.pyc$', '\.egg-info$', '\.__pycache__$']
 let NERDTreeShowHidden=1
 let loaded_netrw=0  " Turn off netrw
-" autocmd VimEnter * NERDTree
+
+autocmd StdinReadPre * let s:std_in=1
+" autocmd VimEnter * if (argc() == 0 || argv()[0] == '.') && !exists("s:std_in") | NERDTree | endif  " Open on folder by default
+
 
 " Ag
 
@@ -28,8 +31,11 @@ let g:onedark_termcolors=16
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-jedi'
 let g:deoplete#enable_at_startup = 1
+
+" Figure out the system Python for Neovim.
 let g:python_host_prog = '/usr/local/bin/python'
-let g:python3_host_prog = '/usr/local/bin/python3'
+let g:python2_host_prog = '/usr/local/bin/python2'
+let g:python3_host_prog=substitute(system("/usr/bin/env which python3"), "\n", '', 'g')
 " Use shift to cycle through completions.
 inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 inoremap <expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
@@ -50,6 +56,8 @@ let g:pymode_options_colorcolumn = 0
 let g:pymode_rope = 0
 let g:pymode_rope_completion = 0
 
+Plug 'fisadev/vim-isort'
+
 
 " Gutentags
 Plug 'ludovicchabant/vim-gutentags'
@@ -66,10 +74,19 @@ highlight clear SignColumn
 Plug 'neomake/neomake'
 autocmd BufWritePost,BufEnter * Neomake
 
-let g:neomake_java_enabled_makers = []
-let g:neomake_python_enabled_makers = ['flake8', 'pylint', 'mypy']
+let g:neomake_python_enabled_makers = ['flake8', 'mypy']
 let g:neomake_highlight_columns = 0
 
+
+" Format
+
+Plug 'Chiel92/vim-autoformat'
+autocmd BufWrite * Autoformat
+
+
+" Other languages
+Plug 'pangloss/vim-javascript'
+Plug 'saltstack/salt-vim'
 
 call plug#end()
 
