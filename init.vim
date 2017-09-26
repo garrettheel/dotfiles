@@ -5,6 +5,48 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 nnoremap <C-p> :FZF<CR>
 
+" let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+
+" Redefine :Ag command
+function! s:ag_with_opts(arg, bang)
+  let tokens  = split(a:arg)
+  let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
+  let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
+  call fzf#vim#ag(query, ag_opts, a:bang ? {} : {'down': '40%'})
+endfunction
+
+autocmd VimEnter * command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
+
+" Set fzf statusline color
+function! s:fzf_statusline()
+  highlight fzf1 ctermfg=yellow
+  highlight fzf2 ctermfg=yellow
+  highlight fzf3 ctermfg=yellow
+  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+endfunction
+autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+noremap <silent> <Leader><Leader> :silent FZF <CR>
+
+function! BufList()
+    redir => ls
+    silent ls
+    redir END
+    return split(ls, '\n')
+endfunction
+
+function! BufOpen(e)
+    execute 'buffer '. matchstr(a:e, '^[ 0-9]*')
+endfunction
+
+nnoremap <silent> <Leader><Enter> :silent call fzf#run({
+\   'source':      reverse(BufList()),
+\   'sink':        function('BufOpen'),
+\   'options':     '+m',
+\   'tmux_height': '40%'
+\ })<CR>
+
+
 " NERDTree
 
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
@@ -33,7 +75,7 @@ Plug 'zchee/deoplete-jedi'
 let g:deoplete#enable_at_startup = 1
 
 " Figure out the system Python for Neovim.
-let g:python_host_prog = '/usr/local/bin/python'
+let g:python_host_prog = '/usr/local/bin/python3'
 let g:python2_host_prog = '/usr/local/bin/python2'
 let g:python3_host_prog=substitute(system("/usr/bin/env which python3"), "\n", '', 'g')
 " Use shift to cycle through completions.
@@ -78,10 +120,12 @@ let g:neomake_python_enabled_makers = ['flake8', 'mypy']
 let g:neomake_highlight_columns = 0
 
 
-" Format
-
-Plug 'Chiel92/vim-autoformat'
-autocmd BufWrite * Autoformat
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fugitive.
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
 
 
 " Other languages
@@ -150,3 +194,6 @@ nnoremap <C-H> <C-W><C-H>
 highlight BadWhitespace ctermbg=red guibg=darkred
 au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
+
+" Don't include the newline when moving cursor to end of the line
+nmap $ g_
