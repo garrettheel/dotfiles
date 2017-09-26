@@ -5,7 +5,9 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 nnoremap <C-p> :FZF<CR>
 
-" let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+let $FZF_DEFAULT_COMMAND = 'ag -l -U -g ""'
+let $FZF_DEFAULT_OPTS = '--color 16,bg+:-1'
+let $FZF_CTRL_R_OPTS = '--sort'
 
 " Redefine :Ag command
 function! s:ag_with_opts(arg, bang)
